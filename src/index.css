@@ -1,4 +1,30 @@
 
 body {
-  background: red;
+
+}
+
+.logo, .tagline {
+  text-align: center;
+}
+
+.logo {
+  color: #C0C0C0;
+}
+
+.form-container {
+  margin: 0 auto;
+  width: 50%;
+}
+
+.input {
+  font-size: 1rem;
+}
+
+.submit-btn {
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  width: 95%;
+  padding: 10px 0;
 }
