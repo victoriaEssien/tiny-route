@@ -14,7 +14,7 @@ body {
 }
 
 .form-container {
-  margin: 0 auto;
+  margin: 3% auto 0;
   width: 50%;
 }
 
@@ -85,4 +85,32 @@ hr {
   margin-top: 5px;
   padding: 5px 12px;
   cursor: pointer;
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+  .tagline {
+    margin: auto;
+    font-size: 0.9rem;
+    width: 75%;
+    line-height: 1.6;
+  }
+
+  .form-container {
+    margin: 8% auto 0;
+    width: 90%;
+  }
+  
+  hr {
+    margin: 10% auto 0;
+    width: 90%;
+  }
+
+  .routes-header {
+    margin-top: 8%;
+  }
+
+  .previous-routes-table {
+    margin-top: 8%;
+    width: 90%;
+  }
 }

@@ -143,8 +143,7 @@ function App() {
               </tr>
             ))}
           </tbody>
-</Table>
-
+        </Table>
       </div>
     </div>
   );
