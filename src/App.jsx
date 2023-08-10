@@ -2,15 +2,21 @@ import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 
 function App() {
+  const [urlTitle, setUrlTitle] = useState("");
   const [urlValue, setUrlValue] = useState("");
   const [isValidUrl, setIsValidUrl] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [previousRoutes, setPreviousRoutes] = useState([]);
 
   const handleChange = (event) => {
     setUrlValue(event.target.value);
     setIsValidUrl(true);
     setErrorMessage("");
+  }
+
+  const handleTitleChange = (event) => {
+    setUrlTitle(event.target.value);
   }
 
   const handleSubmit = async (event) => {
@@ -28,16 +34,19 @@ function App() {
             'X-RapidAPI-Host': 'url-shortener-service.p.rapidapi.com'
           },
           body: new URLSearchParams({
-            url: urlValue // Use user-provided URL
+            url: urlValue,
+            title: urlTitle
           })
         });
 
         const result = await response.json();
         if (response.ok) {
-          console.log(result.result_url);
+          const newRoute = { title: urlTitle, url: result.result_url };
+          setUrlTitle("");
           setUrlValue("");
+          setPreviousRoutes((prevRoutes) => [...prevRoutes, newRoute]);
         } else {
-          console.error(result)
+          console.error(result);
         }
       } catch (error) {
         console.error(error);
@@ -55,6 +64,17 @@ function App() {
 
       <div className="form-container">
         <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
+            <Form.Label>Title</Form.Label>
+            <Form.Control
+              type="text"
+              value={urlTitle}
+              onChange={handleTitleChange}
+              className='input'
+              size='lg'
+              placeholder="Enter a title"
+            />
+          </Form.Group>
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Form.Label>Website url</Form.Label>
             <Form.Control
@@ -71,6 +91,19 @@ function App() {
             <button type='submit' className='submit-btn'>Shorten url</button>
           </div>
         </Form>
+      </div>
+
+      {/* Previous Tiny Routes */}
+      <hr />
+      <div className="previous-routes">
+        <h2 className='routes-header'>Previous Tiny Routes</h2>
+        <ul>
+          {previousRoutes.map((route, index) => (
+            <li key={index}>
+              <strong>{route.title}:</strong> <a href={route.url} target="_blank" rel="noopener noreferrer">{route.url}</a>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
