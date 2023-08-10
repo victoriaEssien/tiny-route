@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 
 function App() {
@@ -8,6 +8,18 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [previousRoutes, setPreviousRoutes] = useState([]);
+
+  useEffect(() => {
+    // Retrieve previousRoutes data from localStorage
+    const storedRoutes = localStorage.getItem('previousRoutes');
+    if (storedRoutes) {
+      setPreviousRoutes(JSON.parse(storedRoutes));
+    }
+  }, []); // Only run this effect once, during component initialization
+
+  const saveRoutesToLocalStorage = (routes) => {
+    localStorage.setItem('previousRoutes', JSON.stringify(routes));
+  };
 
   const handleChange = (event) => {
     setUrlValue(event.target.value);
@@ -44,7 +56,11 @@ function App() {
           const newRoute = { title: urlTitle, url: result.result_url };
           setUrlTitle("");
           setUrlValue("");
-          setPreviousRoutes((prevRoutes) => [...prevRoutes, newRoute]);
+          setPreviousRoutes((prevRoutes) => {
+            const updatedRoutes = [...prevRoutes, newRoute];
+            saveRoutesToLocalStorage(updatedRoutes);
+            return updatedRoutes;
+          });
         } else {
           console.error(result);
         }
@@ -57,6 +73,12 @@ function App() {
     }
   }
 
+  const handleDelete = (index) => {
+    const updatedRoutes = previousRoutes.filter((_, i) => i !== index);
+    setPreviousRoutes(updatedRoutes);
+    saveRoutesToLocalStorage(updatedRoutes);
+  };
+
   return (
     <div>
       <h1 className="logo">TinyRoute</h1>
@@ -64,7 +86,7 @@ function App() {
 
       <div className="form-container">
         <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
+          <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
             <Form.Label>Title</Form.Label>
             <Form.Control
               type="text"
@@ -101,6 +123,7 @@ function App() {
           {previousRoutes.map((route, index) => (
             <li key={index}>
               <strong>{route.title}:</strong> <a href={route.url} target="_blank" rel="noopener noreferrer">{route.url}</a>
+              <button onClick={() => handleDelete(index)}>Delete</button>
             </li>
           ))}
         </ul>
