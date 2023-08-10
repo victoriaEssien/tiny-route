@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
+import Table from 'react-bootstrap/Table';
 
 function App() {
   const [urlTitle, setUrlTitle] = useState("");
@@ -8,14 +9,13 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [previousRoutes, setPreviousRoutes] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
-    // Retrieve previousRoutes data from localStorage
     const storedRoutes = localStorage.getItem('previousRoutes');
     if (storedRoutes) {
       setPreviousRoutes(JSON.parse(storedRoutes));
     }
-  }, []); // Only run this effect once, during component initialization
+  }, []);
 
   const saveRoutesToLocalStorage = (routes) => {
     localStorage.setItem('previousRoutes', JSON.stringify(routes));
@@ -38,6 +38,7 @@ function App() {
     const urlPattern = /^(http[s]?:\/\/)(www\.)?[^\s$.?#].[^\s]*$/;
     if (urlPattern.test(urlValue)) {
       try {
+        setIsLoading(true)
         const response = await fetch('https://url-shortener-service.p.rapidapi.com/shorten', {
           method: 'POST',
           headers: {
@@ -54,6 +55,7 @@ function App() {
         const result = await response.json();
         if (response.ok) {
           const newRoute = { title: urlTitle, url: result.result_url };
+          setIsLoading(false)
           setUrlTitle("");
           setUrlValue("");
           setPreviousRoutes((prevRoutes) => {
@@ -63,11 +65,14 @@ function App() {
           });
         } else {
           console.error(result);
+          setIsLoading(false)
         }
       } catch (error) {
         console.error(error);
+        setIsLoading(false)
       }
     } else {
+      setIsLoading(false)
       setIsValidUrl(false);
       setErrorMessage("Please enter a valid URL");
     }
@@ -110,7 +115,9 @@ function App() {
           </Form.Group>
           {isSubmitted && !isValidUrl && <p className='error-message'>{errorMessage}</p>}
           <div className="btn-container">
-            <button type='submit' className='submit-btn'>Shorten url</button>
+            <button type='submit' className='submit-btn' disabled={isLoading}>
+              {isLoading ? "Shortening..." : "Shorten url"}
+            </button>
           </div>
         </Form>
       </div>
@@ -119,14 +126,25 @@ function App() {
       <hr />
       <div className="previous-routes">
         <h2 className='routes-header'>Previous Tiny Routes</h2>
-        <ul>
-          {previousRoutes.map((route, index) => (
-            <li key={index}>
-              <strong>{route.title}:</strong> <a href={route.url} target="_blank" rel="noopener noreferrer">{route.url}</a>
-              <button onClick={() => handleDelete(index)}>Delete</button>
-            </li>
-          ))}
-        </ul>
+        <Table striped bordered hover className="previous-routes-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Shortened URL</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {previousRoutes.map((route, index) => (
+              <tr key={index}>
+                <td>{route.title}</td>
+                <td><a href={route.url} className='route-link' target="_blank" rel="noopener noreferrer">{route.url}</a></td>
+                <td><button className='delete-btn' onClick={() => handleDelete(index)}><i className="fas fa-trash"></i></button></td>
+              </tr>
+            ))}
+          </tbody>
+</Table>
+
       </div>
     </div>
   );
