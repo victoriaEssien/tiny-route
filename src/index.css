@@ -1,6 +1,7 @@
 
 body {
-
+  box-sizing: border-box;
+  font-family: 'Nunito', sans-serif;
 }
 
 .logo, .tagline {
@@ -18,6 +19,20 @@ body {
 
 .input {
   font-size: 1rem;
+  padding: 10px 12px;
+}
+
+.invalid {
+  border: 1.5px solid #ed8078;
+  color: #e02c1f;
+}
+
+.error-message {
+  color: #e02c1f;
+}
+
+.btn-container {
+  text-align: center;
 }
 
 .submit-btn {
@@ -25,6 +40,6 @@ body {
   color: #fff;
   border: none;
   border-radius: 5px;
-  width: 95%;
-  padding: 10px 0;
+  width: 98%;
+  padding: 12px 0;
 }
