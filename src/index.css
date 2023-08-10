@@ -9,6 +9,7 @@ body {
 }
 
 .logo {
+  margin-top: 5%;
   color: #C0C0C0;
 }
 
@@ -40,6 +41,13 @@ body {
   color: #fff;
   border: none;
   border-radius: 5px;
-  width: 98%;
+  width: 100%;
+  margin-top: 5px;
   padding: 12px 0;
+  cursor: pointer;
+}
+
+.submit-btn:hover{
+  background: #4d4d4d;
+  transition: 5ms;
 }

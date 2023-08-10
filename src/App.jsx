@@ -13,14 +13,35 @@ function App() {
     setErrorMessage("");
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitted(true);
 
     const urlPattern = /^(http[s]?:\/\/)(www\.)?[^\s$.?#].[^\s]*$/;
     if (urlPattern.test(urlValue)) {
-      console.log(urlValue);
-      setUrlValue("");
+      try {
+        const response = await fetch('https://url-shortener-service.p.rapidapi.com/shorten', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            'X-RapidAPI-Key': 'b2be6a3495msh4f3272137c52a2ep13ed5ajsn502f083243a9',
+            'X-RapidAPI-Host': 'url-shortener-service.p.rapidapi.com'
+          },
+          body: new URLSearchParams({
+            url: urlValue // Use user-provided URL
+          })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          console.log(result.result_url);
+          setUrlValue("");
+        } else {
+          console.error(result)
+        }
+      } catch (error) {
+        console.error(error);
+      }
     } else {
       setIsValidUrl(false);
       setErrorMessage("Please enter a valid URL");
