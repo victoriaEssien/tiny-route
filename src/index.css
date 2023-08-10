@@ -87,6 +87,13 @@ hr {
   cursor: pointer;
 }
 
+.empty-message {
+  text-align: center;
+  margin: 5% 0;
+  font-size: 1rem;
+  color: #b3b3b3;
+}
+
 @media (min-width: 320px) and (max-width: 480px) {
   .tagline {
     margin: auto;
@@ -112,5 +119,12 @@ hr {
   .previous-routes-table {
     margin-top: 8%;
     width: 90%;
+  }
+
+  .empty-message {
+    margin: 8% auto 0;
+    width: 55%;
+    line-height: 1.6;
+    font-size: 1.1rem;
   }
 }

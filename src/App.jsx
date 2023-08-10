@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import Form from 'react-bootstrap/Form';
-import Table from 'react-bootstrap/Table';
+import { Form, Table } from 'react-bootstrap';
+import './index.css'; // Import your CSS file
 
 function App() {
-  const [urlTitle, setUrlTitle] = useState("");
-  const [urlValue, setUrlValue] = useState("");
+  const [urlTitle, setUrlTitle] = useState('');
+  const [urlValue, setUrlValue] = useState('');
   const [isValidUrl, setIsValidUrl] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [previousRoutes, setPreviousRoutes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const storedRoutes = localStorage.getItem('previousRoutes');
     if (storedRoutes) {
@@ -22,14 +23,16 @@ function App() {
   };
 
   const handleChange = (event) => {
-    setUrlValue(event.target.value);
+    const { value } = event.target;
+    setUrlValue(value);
     setIsValidUrl(true);
-    setErrorMessage("");
-  }
+    setErrorMessage('');
+  };
 
   const handleTitleChange = (event) => {
-    setUrlTitle(event.target.value);
-  }
+    const { value } = event.target;
+    setUrlTitle(value);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -38,26 +41,26 @@ function App() {
     const urlPattern = /^(http[s]?:\/\/)(www\.)?[^\s$.?#].[^\s]*$/;
     if (urlPattern.test(urlValue)) {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
         const response = await fetch('https://url-shortener-service.p.rapidapi.com/shorten', {
           method: 'POST',
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
             'X-RapidAPI-Key': 'b2be6a3495msh4f3272137c52a2ep13ed5ajsn502f083243a9',
-            'X-RapidAPI-Host': 'url-shortener-service.p.rapidapi.com'
+            'X-RapidAPI-Host': 'url-shortener-service.p.rapidapi.com',
           },
           body: new URLSearchParams({
             url: urlValue,
-            title: urlTitle
-          })
+            title: urlTitle,
+          }),
         });
 
         const result = await response.json();
         if (response.ok) {
           const newRoute = { title: urlTitle, url: result.result_url };
-          setIsLoading(false)
-          setUrlTitle("");
-          setUrlValue("");
+          setIsLoading(false);
+          setUrlTitle('');
+          setUrlValue('');
           setPreviousRoutes((prevRoutes) => {
             const updatedRoutes = [...prevRoutes, newRoute];
             saveRoutesToLocalStorage(updatedRoutes);
@@ -65,24 +68,53 @@ function App() {
           });
         } else {
           console.error(result);
-          setIsLoading(false)
+          setIsLoading(false);
         }
       } catch (error) {
         console.error(error);
-        setIsLoading(false)
+        setIsLoading(false);
       }
     } else {
-      setIsLoading(false)
+      setIsLoading(false);
       setIsValidUrl(false);
-      setErrorMessage("Please enter a valid URL");
+      setErrorMessage('Please enter a valid URL');
     }
-  }
+  };
 
   const handleDelete = (index) => {
     const updatedRoutes = previousRoutes.filter((_, i) => i !== index);
     setPreviousRoutes(updatedRoutes);
     saveRoutesToLocalStorage(updatedRoutes);
   };
+
+  const renderRoutesTable = () => (
+    <Table striped bordered hover className="previous-routes-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Shortened URL</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {previousRoutes.map((route, index) => (
+          <tr key={index}>
+            <td>{route.title}</td>
+            <td>
+              <a href={route.url} className="route-link" target="_blank" rel="noopener noreferrer">
+                {route.url}
+              </a>
+            </td>
+            <td>
+              <button className="delete-btn" onClick={() => handleDelete(index)}>
+                <i className="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  );
 
   return (
     <div>
@@ -97,8 +129,8 @@ function App() {
               type="text"
               value={urlTitle}
               onChange={handleTitleChange}
-              className='input'
-              size='lg'
+              className="input"
+              size="lg"
               placeholder="Enter a title"
             />
           </Form.Group>
@@ -109,14 +141,14 @@ function App() {
               value={urlValue}
               onChange={handleChange}
               className={isSubmitted && !isValidUrl ? 'input invalid' : 'input'}
-              size='lg'
+              size="lg"
               placeholder="https://website.com"
             />
           </Form.Group>
-          {isSubmitted && !isValidUrl && <p className='error-message'>{errorMessage}</p>}
+          {isSubmitted && !isValidUrl && <p className="error-message">{errorMessage}</p>}
           <div className="btn-container">
-            <button type='submit' className='submit-btn' disabled={isLoading}>
-              {isLoading ? "Shortening..." : "Shorten url"}
+            <button type="submit" className="submit-btn" disabled={isLoading}>
+              {isLoading ? 'Shortening...' : 'Shorten url'}
             </button>
           </div>
         </Form>
@@ -125,25 +157,8 @@ function App() {
       {/* Previous Tiny Routes */}
       <hr />
       <div className="previous-routes">
-        <h2 className='routes-header'>Previous Tiny Routes</h2>
-        <Table striped bordered hover className="previous-routes-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Shortened URL</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {previousRoutes.map((route, index) => (
-              <tr key={index}>
-                <td>{route.title}</td>
-                <td><a href={route.url} className='route-link' target="_blank" rel="noopener noreferrer">{route.url}</a></td>
-                <td><button className='delete-btn' onClick={() => handleDelete(index)}><i className="fas fa-trash"></i></button></td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <h2 className="routes-header">Previous Tiny Routes</h2>
+        {previousRoutes.length === 0 ? <p className='empty-message'>When you shorten a link, it shows up here!</p> : renderRoutesTable()}
       </div>
     </div>
   );
